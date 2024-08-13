@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo List App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #e0f7fa;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            display: flex;
+            margin-bottom: 10px;
+        }
+        .form-group input, .form-group select {
+            flex: 1;
+            padding: 10px;
+            margin-right: 10px;
+        }
+        .form-group button {
+            padding: 10px;
+            cursor: pointer;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #00acc1;
+            color: white;
+        }
+        .btn {
+            padding: 5px 10px;
+            margin-right: 5px;
+            cursor: pointer;
+            border: none;
+            border-radius: 3px;
+        }
+        .btn.archive {
+            background-color: #ff5722;
+            color: white;
+        }
+        .btn.restore {
+            background-color: #4caf50;
+            color: white;
+        }
+        .btn.delete {
+            background-color: #f44336;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Todo List</h2>
+    <div class="form-group">
+        <input type="text" id="todoInput" placeholder="Enter Todo Name">
+        <select id="priorityInput">
+            <option value="Low">Low</option>
+            <option value="Medium">Medium</option>
+            <option value="High">High</option>
+        </select>
+        <button onclick="addTodo()">Add Todo</button>
+    </div>
+
+    <table id="todoTable">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Priority</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Todo items will be added here -->
+        </tbody>
+    </table>
+</div>
+
+<script>
+    let todos = JSON.parse(localStorage.getItem('todos')) || [];
+
+    function addTodo() {
+        const todoName = document.getElementById('todoInput').value;
+        const priority = document.getElementById('priorityInput').value;
+
+        if (todoName === "") {
+            alert("Todo cannot be empty!");
+            return;
+        }
+
+        const todo = {
+            name: todoName,
+            priority: priority,
+            status: 'Pending'
+        };
+
+        todos.push(todo);
+        localStorage.setItem('todos', JSON.stringify(todos));
+        renderTodos();
+    }
+
+    function toggleStatus(index) {
+        todos[index].status = todos[index].status === 'Pending' ? 'Completed' : 'Pending';
+        localStorage.setItem('todos', JSON.stringify(todos));
+        renderTodos();
+    }
+
+    function deleteTodo(index) {
+        todos.splice(index, 1);
+        localStorage.setItem('todos', JSON.stringify(todos));
+        renderTodos();
+    }
+
+    function renderTodos() {
+        const tbody = document.querySelector('#todoTable tbody');
+        tbody.innerHTML = '';
+        todos.forEach((todo, index) => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${todo.name}</td>
+                <td style="background-color: ${getPriorityColor(todo.priority)};">${todo.priority}</td>
+                <td style="cursor: pointer;" onclick="toggleStatus(${index})">${todo.status}</td>
+                <td>
+                    <button class="btn delete" onclick="deleteTodo(${index})">Delete</button>
+                </td>
+            `;
+            tbody.appendChild(row);
+        });
+    }
+
+    function getPriorityColor(priority) {
+        switch (priority) {
+            case 'Low': return '#c8e6c9';
+            case 'Medium': return '#fff9c4';
+            case 'High': return '#ffcdd2';
+        }
+    }
+
+    renderTodos();
+</script>
+
+</body>
+</html>

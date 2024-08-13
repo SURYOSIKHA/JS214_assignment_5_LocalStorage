@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Card Management</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+        .navbar {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+        }
+        .navbar button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .card {
+            background-color: white;
+            padding: 20px;
+            margin-bottom: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .card h3 {
+            margin: 0;
+        }
+        .card p {
+            margin: 5px 0;
+        }
+        .card button {
+            margin-top: 10px;
+            padding: 5px 10px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="navbar">
+        <button onclick="showUsers()">Users</button>
+        <button onclick="showCart()">Cart</button>
+    </div>
+
+    <div id="userList">
+        <!-- User cards will be rendered here -->
+    </div>
+
+    <div id="cartList" class="hidden">
+        <!-- Cart items will be rendered here -->
+    </div>
+
+    <script>
+        const users = [
+            { id: 1, name: "Leanne Graham", email: "Sincere@april.biz" },
+            { id: 2, name: "Ervin Howell", email: "Shanna@melissa.tv" },
+            { id: 3, name: "Clementine Bauch", email: "Nathan@yesenia.net" },
+            { id: 4, name: "Patricia Lebsack", email: "Julianne.OConner@kory.org" },
+            { id: 5, name: "Chelsey Dietrich", email: "Lucio_Hettinger@annie.ca" },
+            { id: 6, name: "Dennis Schulist", email: "Karley_Dach@jasper.info" },
+            { id: 7, name: "Kurtis Weissnat", email: "Telly.Hoeger@billy.biz" },
+            { id: 8, name: "Nicholas Runolfsdottir V", email: "Sherwood@rosamond.me" },
+            { id: 9, name: "Glenna Reichert", email: "Chaim_McDermott@dana.io" },
+            { id: 10, name: "Clementina DuBuque", email: "Rey.Padberg@karina.biz" }
+        ];
+
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+        function renderUsers() {
+            const userList = document.getElementById('userList');
+            userList.innerHTML = '';
+            users.forEach(user => {
+                const userCard = document.createElement('div');
+                userCard.className = 'card';
+                userCard.innerHTML = `
+                    <h3>${user.name}</h3>
+                    <p>Email: ${user.email}</p>
+                    <button onclick="addToCart(${user.id})">Add to Cart</button>
+                `;
+                userList.appendChild(userCard);
+            });
+        }
+
+        function renderCart() {
+            const cartList = document.getElementById('cartList');
+            cartList.innerHTML = '';
+            cart.forEach(item => {
+                const cartItem = document.createElement('div');
+                cartItem.className = 'card';
+                cartItem.innerHTML = `
+                    <h3>${item.name}</h3>
+                    <p>Email: ${item.email}</p>
+                    <button onclick="removeFromCart(${item.id})">Delete</button>
+                `;
+                cartList.appendChild(cartItem);
+            });
+        }
+
+        function addToCart(userId) {
+            const user = users.find(u => u.id === userId);
+            if (!cart.some(item => item.id === user.id)) {
+                cart.push(user);
+                localStorage.setItem('cart', JSON.stringify(cart));
+                renderCart();
+            }
+        }
+
+        function removeFromCart(userId) {
+            cart = cart.filter(item => item.id !== userId);
+            localStorage.setItem('cart', JSON.stringify(cart));
+            renderCart();
+        }
+
+        function showUsers() {
+            document.getElementById('userList').classList.remove('hidden');
+            document.getElementById('cartList').classList.add('hidden');
+        }
+
+        function showCart() {
+            document.getElementById('userList').classList.add('hidden');
+            document.getElementById('cartList').classList.remove('hidden');
+        }
+
+        // Initial render
+        renderUsers();
+        renderCart();
+    </script>
+
+</body>
+</html>

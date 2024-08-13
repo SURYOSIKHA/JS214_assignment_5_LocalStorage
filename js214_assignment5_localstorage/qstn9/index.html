@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music Playlist Manager</title>
+    <style>
+        /* Basic CSS styles for the playlist manager */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .playlist-form {
+            margin-bottom: 20px;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        select {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background: #5c67f2;
+            border: none;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+
+        button:hover {
+            background: #4852c7;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Music Playlist Manager</h1>
+        <div class="playlist-form">
+            <input type="text" id="songTitle" placeholder="Song Title" required>
+            <input type="text" id="artist" placeholder="Artist" required>
+            <input type="number" id="duration" placeholder="Duration (min)" required>
+            <select id="genre">
+                <option value="">Select Genre</option>
+                <option value="Rock">Rock</option>
+                <option value="Pop">Pop</option>
+                <option value="Jazz">Jazz</option>
+                <option value="Hip-hop">Hip-hop</option>
+                <option value="Classical">Classical</option>
+            </select>
+            <button onclick="addSong()">Add Song</button>
+        </div>
+        <h2>Your Playlist</h2>
+        <input type="text" id="search" placeholder="Search by title or artist" onkeyup="searchSongs()">
+        <table id="playlistTable">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Artist</th>
+                    <th>Duration</th>
+                    <th>Genre</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Playlist songs will be displayed here -->
+            </tbody>
+        </table>
+        <button onclick="savePlaylist()">Save Playlist</button>
+    </div>
+
+    <script>
+        let playlist = JSON.parse(localStorage.getItem('playlist')) || [];
+
+        function displaySongs() {
+            const tbody = document.querySelector('#playlistTable tbody');
+            tbody.innerHTML = '';
+            playlist.forEach((song, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${song.title}</td>
+                    <td>${song.artist}</td>
+                    <td>${song.duration}</td>
+                    <td>${song.genre}</td>
+                    <td>
+                        <button onclick="editSong(${index})">Edit</button>
+                        <button onclick="deleteSong(${index})">Delete</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function addSong() {
+            const title = document.getElementById('songTitle').value;
+            const artist = document.getElementById('artist').value;
+            const duration = document.getElementById('duration').value;
+            const genre = document.getElementById('genre').value;
+
+            if (title && artist && duration && genre) {
+                playlist.push({ title, artist, duration, genre });
+                displaySongs();
+                savePlaylist();
+                clearForm();
+            }
+        }
+
+        function deleteSong(index) {
+            playlist.splice(index, 1);
+            displaySongs();
+            savePlaylist();
+        }
+
+        function editSong(index) {
+            const song = playlist[index];
+            document.getElementById('songTitle').value = song.title;
+            document.getElementById('artist').value = song.artist;
+            document.getElementById('duration').value = song.duration;
+            document.getElementById('genre').value = song.genre;
+            deleteSong(index);
+        }
+
+        function clearForm() {
+            document.getElementById('songTitle').value = '';
+            document.getElementById('artist').value = '';
+            document.getElementById('duration').value = '';
+            document.getElementById('genre').value = '';
+        }
+
+        function savePlaylist() {
+            localStorage.setItem('playlist', JSON.stringify(playlist));
+        }
+
+        function searchSongs() {
+            const query = document.getElementById('search').value.toLowerCase();
+            const filteredPlaylist = playlist.filter(song => 
+                song.title.toLowerCase().includes(query) || 
+                song.artist.toLowerCase().includes(query)
+            );
+            const tbody = document.querySelector('#playlistTable tbody');
+            tbody.innerHTML = '';
+            filteredPlaylist.forEach((song, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${song.title}</td>
+                    <td>${song.artist}</td>
+                    <td>${song.duration}</td>
+                    <td>${song.genre}</td>
+                    <td>
+                        <button onclick="editSong(${index})">Edit</button>
+                        <button onclick="deleteSong(${index})">Delete</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        window.onload = function() {
+            displaySongs();
+        }
+    </script>
+</body>
+</html>

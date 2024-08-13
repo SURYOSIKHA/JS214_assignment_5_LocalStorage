@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced File Processing</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f0f0f0;
+        }
+        h1 {
+            color: #333;
+        }
+        pre {
+            background-color: #333;
+            color: #fff;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Advanced File Processing</h1>
+    <pre id="output"></pre>
+
+    <script>
+        // Function to process the files
+        function processFiles(files) {
+            // 1. Calculate the total size of all files
+            const totalSize = files.reduce((acc, file) => acc + file.size, 0);
+
+            // 2. Sort files by size in descending order and pick the top 5
+            const largestFiles = [...files].sort((a, b) => b.size - a.size).splice(0, 5);
+
+            // 3. Group files by their extension
+            const filesByExtension = files.reduce((acc, file) => {
+                const ext = file.name.split('.').pop();
+                if (!acc[ext]) {
+                    acc[ext] = [];
+                }
+                acc[ext].push(file.name);
+                return acc;
+            }, {});
+
+            return {
+                totalsize: totalSize,
+                largestFiles: largestFiles,
+                filesByExtension: filesByExtension
+            };
+        }
+
+        // Example file array
+        const files = [
+            { name: "document.pdf", size: 300 },
+            { name: "image1.png", size: 50 },
+            { name: "program.exe", size: 1200 },
+            { name: "notes.txt", size: 100 },
+            { name: "photo.jpg", size: 500 },
+            { name: "archive.zip", size: 200 },
+            { name: "report.pdf", size: 150 },
+            { name: "image2.png", size: 75 },
+            { name: "data.csv", size: 175 },
+            { name: "document3.pdf", size: 200 },
+        ];
+
+        // Process the files and display the output
+        const result = processFiles(files);
+        document.getElementById('output').textContent = JSON.stringify(result, null, 2);
+    </script>
+</body>
+</html>
